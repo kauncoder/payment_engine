@@ -1,6 +1,6 @@
-use std::{collections::HashMap, env, error::Error, fs::File};
+use std::{collections::HashMap, env, error::Error, fs::File, io};
 mod payments;
-use csv::{ReaderBuilder, Trim};
+use csv::{ReaderBuilder, Trim, Writer};
 use payments::{ClientMap, Transaction, TxnAmountMap};
 use std::fs::metadata;
 
@@ -31,7 +31,22 @@ fn read_csv(file_path: &str) -> Result<(), Box<dyn Error>> {
             txn.process(&mut client_data, &mut txn_map)?;
         }
     }
-    println!("client data: {:?}", client_data);
+    write_csv(client_data)?;
+    Ok(())
+}
+
+fn write_csv(client_data: ClientMap) -> Result<(), Box<dyn Error>> {
+    // Create a CSV writer that writes to stdout
+    let mut wtr = Writer::from_writer(io::stdout());
+
+    // Write each person struct as a record in CSV format
+    for (_, client) in client_data {
+        wtr.serialize(client)?;
+    }
+
+    // Flush the writer to ensure everything is written out
+    wtr.flush()?;
+
     Ok(())
 }
 

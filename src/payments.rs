@@ -20,6 +20,7 @@ fn default_resource() -> Option<AmountFloatType> {
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct Client {
+    pub client: u16,
     pub available: AmountFloatType,
     pub held: AmountFloatType,
     pub total: AmountFloatType,
@@ -74,6 +75,7 @@ impl Transaction {
     fn get_client(id: u16, client_map: &mut ClientMap) -> &mut Client {
         //get id if it exists, else create new one that is empty
         let default_client = Client {
+            client: 0,
             available: 0.0,
             held: 0.0,
             total: 0.0,
@@ -179,11 +181,10 @@ impl Transaction {
         //read the txn that was resolved and get amount
         if let Ok((txn_type, amount)) = Self::get_txn_info(self.tx, txn_map) {
             if txn_type == "dispute" {
-                //decrease held amount, decrease total fund amount
+                //decrease held amount
                 let client = Self::get_client(self.client, client_map);
                 client.locked = true;
                 client.decrease(AmountType::Held, amount)?;
-                client.decrease(AmountType::Available, amount)?;
             }
         }
         Ok(())
