@@ -75,7 +75,7 @@ impl Transaction {
     fn get_client(id: u16, client_map: &mut ClientMap) -> &mut Client {
         //get id if it exists, else create new one that is empty
         let default_client = Client {
-            client: 0,
+            client: id,
             available: 0.0,
             held: 0.0,
             total: 0.0,
